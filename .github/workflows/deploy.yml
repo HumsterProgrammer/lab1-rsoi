@@ -38,7 +38,7 @@ jobs:
           docker run --network host \
             -e DATABASE_URL=$DATABASE_URL \
             my-app-image \
-            sh -c "your_test_command"
+            sh -c "python -m unittest tests"
 
   deploy:
     needs: build-and-test
