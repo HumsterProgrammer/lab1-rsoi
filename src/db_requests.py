@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg
 
 def db_get_cursor():
 	conn = psycopg2.connect(database="persons",
@@ -24,3 +24,4 @@ def db_get_persons(cursor):
 	return cursor.fetchall()
 
 def get_by_id():
+	return None
