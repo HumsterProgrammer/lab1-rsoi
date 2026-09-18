@@ -4,7 +4,6 @@ from unittest.mock import patch, Mock
 import app as app_module
 from db_requests import db_create_table
 
-
 class AppTests(unittest.TestCase):
     def setUp(self):
         app_module.app.config["TESTING"] = True
