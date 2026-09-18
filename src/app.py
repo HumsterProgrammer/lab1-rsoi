@@ -74,5 +74,13 @@ def patch_persons():
 def delete_persons():
 	return "501 Not Implemented"
 
+def init_app():
+	cursor = db_get_cursor()
+	db_create_table(cursor)
+	return cursor
+
 if __name__ == "__main__":
+	cursor = init_app()
+	
+	app.custom_db_cursor = cursor
 	app.run(debug=True)
