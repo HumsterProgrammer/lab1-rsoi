@@ -1,86 +1,98 @@
-from flask import Flask
-from db_requests import *
+from flask import Flask, request, jsonify
+from db_requests import (
+    db_get_cursor,
+    db_create_table,
+    db_get_persons,
+    db_get_by_id,
+    db_post_persons,
+    db_update_persons,
+    db_delete_persons,
+)
 
-"""
-* `GET /persons/{personId}` – информация о человеке;
-* `GET /persons` – информация по всем людям;
-* `POST /persons` – создание новой записи о человеке;
-* `PATCH /persons/{personId}` – обновление существующей записи о человеке;
-* `DELETE /persons/{personId}` – удаление записи о человеке.
+app = Flask(__name__)
 
-PersonRequest:
-  required:
-  - name
-  type: object
-  properties:
-    name:
-      type: string
-    age:
-      type: integer
-      format: int32
-    address:
-      type: string
-    work:
-      type: string
-PersonResponse:
-  required:
-  - id
-  - name
-  type: object
-  properties:
-    id:
-      type: integer
-      format: int32
-    name:
-      type: string
-    age:
-      type: integer
-      format: int32
-    address:
-      type: string
-    work:
-      type: string
-"""
 
-app_name = "persons"
-app = Flask(app_name)
+def get_cursor():
+    if "DB_CURSOR" in app.config:
+        return app.config["DB_CURSOR"]
+    return db_get_cursor()
 
-# `GET /persons/{personId}` – информация о человеке;
-@app.route("/persons/<personId>", methods=["GET"])
-def get_persons_id(personId):
-	status, data = get_by_id(personId)
-	if status:
-		# собираем json
-		return json_response, 200
-	return "", 404
 
-# `GET /persons` – информация по всем людям;
+# GET /persons/{personId} — информация о человеке
+@app.route("/persons/<int:personId>", methods=["GET"])
+def get_person_by_id(personId):
+    status, person = db_get_by_id(get_cursor(), personId)
+    if status:
+        return jsonify(person), 200
+    return jsonify({"error": "Person not found"}), 404
+
+
+# GET /persons — информация по всем людям
 @app.route("/persons", methods=["GET"])
 def get_persons():
-	return "501 Not Implemented", 200
+    status, persons = db_get_persons(get_cursor())
+    if status:
+        return jsonify(persons), 200
+    return jsonify({"error": "Database error"}), 500
 
-# `POST /persons` – создание новой записи о человеке;
+
+# POST /persons — создание новой записи
 @app.route("/persons", methods=["POST"])
-def post_persons():
-	return "501 Not Implemented", 201
+def post_person():
+    data = request.get_json(silent=True)
 
-# `PATCH /persons/{personId}` – обновление существующей записи о человеке;
-@app.route("/persons", methods=["PATCH"])
-def patch_persons():
-	return "501 Not Implemented"
-	
-# `DELETE /persons/{personId}` – удаление записи о человеке.
-@app.route("/persons", methods=["DELETE"])
-def delete_persons():
-	return "501 Not Implemented"
+    if not data or "name" not in data:
+        return jsonify({"error": "Field 'name' is required"}), 400
+
+    status, person = db_post_persons(
+        get_cursor(),
+        name=data.get("name"),
+        age=data.get("age"),
+        address=data.get("address"),
+        work=data.get("work"),
+    )
+
+    if status:
+        return jsonify(person), 201
+    return jsonify({"error": "Database error"}), 500
+
+
+# PATCH /persons/{personId} — обновление записи
+@app.route("/persons/<int:personId>", methods=["PATCH"])
+def patch_person(personId):
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error": "Empty request body"}), 400
+
+    allowed = {"name", "age", "address", "work"}
+    if not any(key in data for key in allowed):
+        return jsonify({"error": "No fields to update"}), 400
+
+    status, person = db_update_persons(get_cursor(), personId, data)
+
+    if status:
+        return jsonify(person), 200
+    return jsonify({"error": "Person not found"}), 404
+
+
+# DELETE /persons/{personId} — удаление записи
+@app.route("/persons/<int:personId>", methods=["DELETE"])
+def delete_person(personId):
+    status = db_delete_persons(get_cursor(), personId)
+
+    if status:
+        return "", 204
+    return jsonify({"error": "Person not found"}), 404
+
 
 def init_app():
-	cursor = db_get_cursor()
-	db_create_table(cursor)
-	return cursor
+    cursor = db_get_cursor()
+    db_create_table(cursor)
+    return cursor
+
 
 if __name__ == "__main__":
-	cursor = init_app()
-	
-	app.custom_db_cursor = cursor
-	app.run(debug=True)
+    cursor = init_app()
+    app.config["DB_CURSOR"] = cursor
+    app.run(debug=True, host="0.0.0.0")
