@@ -13,6 +13,12 @@ services:
       - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
+  app:
+    build: .
+    restart: on-failure
+    ports:
+      - "80:80"
+
 
 volumes:
   db-data:
