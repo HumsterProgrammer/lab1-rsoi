@@ -24,7 +24,7 @@ jobs:
         run: docker compose down -v
       
       - name: Trigger Render deploy
-        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
       # added part end
       
       - name: Run API Tests
