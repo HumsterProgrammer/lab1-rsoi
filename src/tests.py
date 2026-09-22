@@ -5,6 +5,9 @@ from unittest.mock import patch, Mock
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+from db_requests import *
+from app import *
+
 class AppTests(unittest.TestCase):
     def setUp(self):
         app_module.app.config["TESTING"] = True
