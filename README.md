@@ -1,5 +1,7 @@
 # Лабораторная работа #1
 
+обновленный readme
+
 ![GitHub Classroom Workflow](../../workflows/GitHub%20Classroom%20Workflow/badge.svg?branch=master)
 
 ## Continuous Integration & Continuous Delivery
