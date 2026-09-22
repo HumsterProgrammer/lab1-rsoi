@@ -1,4 +1,8 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
+
+
+#RUN apt-get update -m
+RUN apt-get update && apt-get install -y libpq-dev gcc
 
 # set a directory for the app
 WORKDIR /usr/src/app
@@ -12,6 +16,8 @@ COPY ./src .
 
 # tell the port number the container should expose
 EXPOSE 5000
+
+RUN python -c "import psycopg2; print(f'psycopg2 libpq version: {psycopg2.__libpq_version__}'); print(1)"
 
 # run the command
 CMD ["python", "./app.py"]
