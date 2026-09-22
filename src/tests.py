@@ -6,7 +6,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 from db_requests import *
-from app import *
+import app as app_module
 
 class AppTests(unittest.TestCase):
     def setUp(self):
