@@ -1,14 +1,16 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
+
 
 
 def db_get_cursor():
     conn = psycopg2.connect(
-        database="persons",
-        host="db_host",
-        user="program",
-        password="test",
-        port="5432"
+        database=os.getenv("DB_NAME", "persons"),
+        host=os.getenv("DB_HOST", "db_host"),
+        user=os.getenv("DB_USER", "program"),
+        password=os.getenv("DB_PASSWORD", "test"),
+        port=os.getenv("DB_PORT", "5432"),
     )
     return conn.cursor(cursor_factory=RealDictCursor)
 

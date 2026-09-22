@@ -1,24 +1,33 @@
 version: "3"
 services:
-  postgres:
-    image: library/postgres:13
-    container_name: postgres
-    restart: on-failure
+  db:
+    image: postgres:16-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      - ./postgres/:/docker-entrypoint-initdb.d/
+      POSTGRES_DB: persons
+      POSTGRES_USER: program
+      POSTGRES_PASSWORD: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U program -d persons"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
     ports:
       - "5432:5432"
+
   app:
     build: .
-    restart: on-failure
-    ports:
-      - "80:80"
-
-
-volumes:
-  db-data:
+    environment:
+      DB_NAME: persons
+      DB_HOST: db
+      DB_USER: program
+      DB_PASSWORD: test
+      DB_PORT: "5432"
+      TEST_DB_NAME: persons
+      TEST_DB_HOST: db
+      TEST_DB_USER: program
+      TEST_DB_PASSWORD: test
+      TEST_DB_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python -m unittest tests.py -v
