@@ -50,7 +50,7 @@ def post_person():
     )
 
     if status:
-        return jsonify(person), 201
+        return jsonify(person), 201, {"Location", f"/api/v1/persons/{person["id"]}"}
     return jsonify({"error": "Database error"}), 500
 
 
