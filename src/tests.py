@@ -55,7 +55,7 @@ class AppTests(unittest.TestCase):
         )
         response = self.client.post("/api/v1/persons", json={"name": "Bob", "age": 25})
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.get_json()["name"], "Bob")
+        self.assertRegex(response.headers["Location"], "/api/v1/persons/")
         mock_post.assert_called_once()
 
     def test_post_missing_name(self):

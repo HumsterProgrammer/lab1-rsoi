@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from db_requests import (
     db_get_cursor,
     db_create_table,
@@ -50,7 +50,9 @@ def post_person():
     )
 
     if status:
-        return jsonify(person), 201, {"Location", f"/api/v1/persons/{person["id"]}"}
+        response = make_response("", 201)
+        response.headers["Location"] = f"/api/v1/persons/{person['id']}"
+        return response#jsonify(person), 201, {"Location", }
     return jsonify({"error": "Database error"}), 500
 
 
