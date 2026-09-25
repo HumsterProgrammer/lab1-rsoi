@@ -26,7 +26,7 @@ class AppTests(unittest.TestCase):
                 {"id": 2, "name": "Bob", "age": 25, "address": None, "work": None},
             ],
         )
-        response = self.client.get("/persons")
+        response = self.client.get("/api/v1/persons")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.get_json()), 2)
         mock_get_persons.assert_called_once()
@@ -37,14 +37,14 @@ class AppTests(unittest.TestCase):
             True,
             {"id": 1, "name": "Alice", "age": 30, "address": "A", "work": "W"},
         )
-        response = self.client.get("/persons/1")
+        response = self.client.get("/api/v1/persons/1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["name"], "Alice")
 
     @patch("app.db_get_by_id")
     def test_get_by_id_not_found(self, mock_get_by_id):
         mock_get_by_id.return_value = (False, None)
-        response = self.client.get("/persons/999")
+        response = self.client.get("/api/v1/persons/999")
         self.assertEqual(response.status_code, 404)
 
     @patch("app.db_post_persons")
@@ -53,13 +53,13 @@ class AppTests(unittest.TestCase):
             True,
             {"id": 1, "name": "Bob", "age": 25, "address": None, "work": None},
         )
-        response = self.client.post("/persons", json={"name": "Bob", "age": 25})
+        response = self.client.post("/api/v1/persons", json={"name": "Bob", "age": 25})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.get_json()["name"], "Bob")
         mock_post.assert_called_once()
 
     def test_post_missing_name(self):
-        response = self.client.post("/persons", json={"age": 25})
+        response = self.client.post("/api/v1/persons", json={"age": 25})
         self.assertEqual(response.status_code, 400)
 
     @patch("app.db_update_persons")
@@ -68,7 +68,7 @@ class AppTests(unittest.TestCase):
             True,
             {"id": 1, "name": "Bob", "age": 26, "address": None, "work": None},
         )
-        response = self.client.patch("/persons/1", json={"age": 26})
+        response = self.client.patch("/api/v1/persons/1", json={"age": 26})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["age"], 26)
         mock_update.assert_called_once()
@@ -76,13 +76,13 @@ class AppTests(unittest.TestCase):
     @patch("app.db_delete_persons")
     def test_delete(self, mock_delete):
         mock_delete.return_value = True
-        response = self.client.delete("/persons/1")
+        response = self.client.delete("/api/v1/persons/1")
         self.assertEqual(response.status_code, 204)
 
     @patch("app.db_delete_persons")
     def test_delete_not_found(self, mock_delete):
         mock_delete.return_value = False
-        response = self.client.delete("/persons/999")
+        response = self.client.delete("/api/v1/persons/999")
         self.assertEqual(response.status_code, 404)
 
 
