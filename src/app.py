@@ -50,9 +50,9 @@ def post_person():
     )
 
     if status:
-        response = make_response("", 201)
+        response = make_response(jsonify(person), 201)
         response.headers["Location"] = f"/api/v1/persons/{person['id']}"
-        return response#jsonify(person), 201, {"Location", }
+        return response
     return jsonify({"error": "Database error"}), 500
 
 
