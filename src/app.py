@@ -18,8 +18,7 @@ def get_cursor():
     return db_get_cursor()
 
 
-# GET /persons/{personId} — информация о человеке
-@app.route("/persons/<int:personId>", methods=["GET"])
+@app.route("/api/v1/persons/<int:personId>", methods=["GET"])
 def get_person_by_id(personId):
     status, person = db_get_by_id(get_cursor(), personId)
     if status:
@@ -27,8 +26,7 @@ def get_person_by_id(personId):
     return jsonify({"error": "Person not found"}), 404
 
 
-# GET /persons — информация по всем людям
-@app.route("/persons", methods=["GET"])
+@app.route("/api/v1/persons", methods=["GET"])
 def get_persons():
     status, persons = db_get_persons(get_cursor())
     if status:
@@ -36,8 +34,7 @@ def get_persons():
     return jsonify({"error": "Database error"}), 500
 
 
-# POST /persons — создание новой записи
-@app.route("/persons", methods=["POST"])
+@app.route("/api/v1/persons", methods=["POST"])
 def post_person():
     data = request.get_json(silent=True)
 
@@ -57,8 +54,7 @@ def post_person():
     return jsonify({"error": "Database error"}), 500
 
 
-# PATCH /persons/{personId} — обновление записи
-@app.route("/persons/<int:personId>", methods=["PATCH"])
+@app.route("/api/v1/persons/<int:personId>", methods=["PATCH"])
 def patch_person(personId):
     data = request.get_json(silent=True)
 
@@ -76,8 +72,7 @@ def patch_person(personId):
     return jsonify({"error": "Person not found"}), 404
 
 
-# DELETE /persons/{personId} — удаление записи
-@app.route("/persons/<int:personId>", methods=["DELETE"])
+@app.route("/api/v1/persons/<int:personId>", methods=["DELETE"])
 def delete_person(personId):
     status = db_delete_persons(get_cursor(), personId)
 
